@@ -1,6 +1,7 @@
 package moe.uoxou.uoxou_arcanum;
 
 import moe.uoxou.uoxou_arcanum.block.ModBlocks;
+import moe.uoxou.uoxou_arcanum.item.ModItems;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.util.Identifier;
 
@@ -10,6 +11,7 @@ public class UoxoUArcanum implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		ModBlocks.init();
+		ModItems.init();
 	}
 
 	public static Identifier identifier(String path) {

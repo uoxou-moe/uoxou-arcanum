@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "uoxou_arcanum:item/embellished_glass_bottle"
+  }
+}
