@@ -18,5 +18,7 @@ public final class ModBlocks {
 		Registry.register(Registries.BLOCK, KEY_MANA_CAULDRON, MANA_CAULDRON);
 
 		Item.BLOCK_ITEMS.put(MANA_CAULDRON, Items.CAULDRON);
+
+		ManaCauldronBlock.init();
 	}
 }
