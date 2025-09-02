@@ -1,22 +1,31 @@
 package moe.uoxou.uoxou_arcanum.block;
 
+import moe.uoxou.uoxou_arcanum.UoxoUArcanum;
+import moe.uoxou.uoxou_arcanum.block.entity.ManaCauldronBlockEntity;
 import moe.uoxou.uoxou_arcanum.item.ModItems;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.LeveledCauldronBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.cauldron.CauldronBehavior;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsage;
 import net.minecraft.item.Items;
 import net.minecraft.potion.Potions;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
 import net.minecraft.util.ItemActionResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.random.Random;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.event.GameEvent;
+import org.jetbrains.annotations.Nullable;
 
-public class ManaCauldronBlock extends LeveledCauldronBlock {
+public class ManaCauldronBlock extends LeveledCauldronBlock implements BlockEntityProvider {
 	private static final CauldronBehavior.CauldronBehaviorMap INTERACTIONS = CauldronBehavior.createMap("mana");
 	private static final CauldronBehavior POUR_MANA = (state, world, pos, player, hand, stack) -> {
 		if (state.get(LeveledCauldronBlock.LEVEL) == 3)
@@ -75,5 +84,23 @@ public class ManaCauldronBlock extends LeveledCauldronBlock {
 
 	public ManaCauldronBlock() {
 		super(Biome.Precipitation.NONE, INTERACTIONS, Settings.copy(Blocks.CAULDRON));
+	}
+
+	@Override
+	public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+		if (world.isClient()) {
+			return null;
+		}
+
+		return (world1, pos, state1, be) -> {
+			if (be instanceof ManaCauldronBlockEntity manaCauldron) {
+				manaCauldron.tick(world1, pos);
+			}
+		};
+	}
+
+	@Override
+	public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+		return new ManaCauldronBlockEntity(pos, state);
 	}
 }
