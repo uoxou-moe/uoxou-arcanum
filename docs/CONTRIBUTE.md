@@ -4,11 +4,11 @@ This document outlines the branching strategy for this project and how to contri
 
 ## Branch Purposes
 
-- `main`: Stable branch containing production-ready code. All completed work is eventually merged here.
-- `{minecraft version}-feat/*`: For developing new features. Create a `{minecraft version}-feat/` branch for each independent feature.
-- `{minecraft version}-bugfix/*`: For addressing non-critical bugs. Use when fixing issues found during development or testing.
-- `{minecraft version}-hotfix/*`: For urgent fixes to production releases. Use only when a critical issue in `main` must be resolved immediately.
-- `{minecraft version}-release`: For preparing a new production release. Use to finalize features and bug fixes before merging to `main`.
+- `{minecraft version}/main`: Stable branch containing production-ready code. All completed work is eventually merged here.
+- `{minecraft version}/feat/*`: For developing new features. Create a `{minecraft version}-feat/` branch for each independent feature.
+- `{minecraft version}/bugfix/*`: For addressing non-critical bugs. Use when fixing issues found during development or testing.
+- `{minecraft version}/hotfix/*`: For urgent fixes to production releases. Use only when a critical issue in `main` must be resolved immediately.
+- `{minecraft version}/release`: For preparing a new production release. Use to finalize features and bug fixes before merging to `main`.
 
 ## When to Create Branches
 
