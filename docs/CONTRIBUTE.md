@@ -1,0 +1,40 @@
+# Contribution Guide
+
+This document outlines the branching strategy for this project and how to contribute changes.
+
+## Branch Purposes
+
+- `{minecraft version}/main`: Latest development branch containing production-ready code. All completed work is eventually merged here.
+- `{minecraft version}/feat/*`: For developing new features. Create a `{minecraft version}/feat/` branch for each independent feature. This branch should be created from `main` and merged back into `main` when the feature is complete and tested.
+- `{minecraft version}/bugfix/*`: For addressing non-critical bugs. Use when fixing issues found during development or testing.
+- `{minecraft version}/hotfix/*`: For urgent fixes to production releases. Use only when a critical issue in `{minecraft version}/main` must be resolved immediately.
+
+## When to Create Branches
+
+| Branch Type | When to Create |
+|-------------|----------------|
+| `{minecraft version}/feat/*` | Starting work on a new feature or enhancement. |
+| `{minecraft version}/bugfix/*`  | Fixing a bug that is not urgent in production. |
+| `{minecraft version}/hotfix/*`  | Addressing a critical issue in production that requires immediate action. |
+
+## Release
+
+Releases are created from the `{minecraft version}/main` branch.
+Release is production version, so it should be stable and well-tested.
+Follow semantic versioning for release tags.
+e.g. `v1.0.0`, `v1.1.0`, `v2.0.0`.
+
+GitHub release: https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository
+semantic versioning: https://semver.org
+
+## Merge Best Practices
+
+1. Keep branches focused and up to date with `{minecraft version}/main`.
+2. Open pull requests early for feedback.
+3. Ensure all tests and checks pass before merging.
+4. Use squash or rebase merges to maintain a clean history, unless project guidelines specify otherwise.
+5. Delete branches after merge to keep the repository tidy.
+
+## Further Contribution Guidelines
+
+For more detailed contribution information, refer to general open source guidelines such as [GitHub's guide to contributing](https://docs.github.com/en/get-started/quickstart/contributing-to-projects) and the [Open Source Guides](https://opensource.guide/how-to-contribute/). Follow any organization-wide contribution standards that apply to this project.
