@@ -11,14 +11,19 @@ import net.minecraft.registry.RegistryKeys;
 
 public final class ModBlocks {
 	public static final Block MANA_CAULDRON = new ManaCauldronBlock();
+	public static final Block POTION_CAULDRON = new PotionCauldronBlock();
 
 	public static final RegistryKey<Block> KEY_MANA_CAULDRON = RegistryKey.of(RegistryKeys.BLOCK, UoxoUArcanum.identifier("mana_cauldron"));
+	public static final RegistryKey<Block> KEY_POTION_CAULDRON = RegistryKey.of(RegistryKeys.BLOCK, UoxoUArcanum.identifier("potion_cauldron"));
 
 	public static void init() {
 		Registry.register(Registries.BLOCK, KEY_MANA_CAULDRON, MANA_CAULDRON);
+		Registry.register(Registries.BLOCK, KEY_POTION_CAULDRON, POTION_CAULDRON);
 
 		Item.BLOCK_ITEMS.put(MANA_CAULDRON, Items.CAULDRON);
+		Item.BLOCK_ITEMS.put(POTION_CAULDRON, Items.CAULDRON);
 
 		ManaCauldronBlock.init();
+		PotionCauldronBlock.init();
 	}
 }
