@@ -1,10 +1,10 @@
 package moe.uoxou.uoxou_arcanum.block.entity;
 
-import moe.uoxou.uoxou_arcanum.UoxoUArcanum;
 import moe.uoxou.uoxou_arcanum.util.PotionUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.ComponentMap;
+import net.minecraft.component.ComponentsAccess;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.nbt.NbtCompound;
@@ -14,6 +14,8 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
@@ -38,20 +40,22 @@ public class PotionCauldronBlockEntity extends BlockEntity {
 		this.potion = potion;
 	}
 
-	@Override
-	protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-		super.readNbt(nbt, registryLookup);
 
-		UoxoUArcanum.LOGGER.info(nbt.contains("Potion"));
-		this.potion = nbt.contains("Potion") ? RegistryKey.of(RegistryKeys.POTION, Identifier.of(nbt.getString("Potion"))) : null;
+	@Override
+	protected void readData(ReadView readView) {
+		super.readData(readView);
+
+		this.potion = readView.getOptionalString("Potion").map(Identifier::tryParse)
+				.map(id -> RegistryKey.of(RegistryKeys.POTION, id))
+				.orElse(null);
 	}
 
 	@Override
-	protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-		super.writeNbt(nbt, registryLookup);
+	protected void writeData(WriteView writeView) {
+		super.writeData(writeView);
 
 		if (this.potion != null) {
-			nbt.putString("Potion", this.potion.getValue().toString());
+			writeView.putString("Potion", this.potion.getValue().toString());
 		}
 	}
 

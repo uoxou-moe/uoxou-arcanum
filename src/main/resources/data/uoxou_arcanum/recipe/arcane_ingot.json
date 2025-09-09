@@ -1,9 +1,7 @@
 {
 	"type": "uoxou_arcanum:alchemy",
 	"ingredients": [
-		{
-			"item": "minecraft:gold_ingot"
-		}
+		"minecraft:gold_ingot"
 	],
 	"result": {
 		"id": "minecraft:diamond"

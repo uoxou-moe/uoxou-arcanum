@@ -1,25 +1,23 @@
 package moe.uoxou.uoxou_arcanum.block;
 
-import moe.uoxou.uoxou_arcanum.UoxoUArcanum;
 import moe.uoxou.uoxou_arcanum.block.entity.ManaCauldronBlockEntity;
 import moe.uoxou.uoxou_arcanum.item.ModItems;
-import net.minecraft.block.*;
+import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.LeveledCauldronBlock;
 import net.minecraft.block.cauldron.CauldronBehavior;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsage;
 import net.minecraft.item.Items;
-import net.minecraft.potion.Potions;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
-import net.minecraft.util.ItemActionResult;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.event.GameEvent;
@@ -29,7 +27,7 @@ public class ManaCauldronBlock extends LeveledCauldronBlock implements BlockEnti
 	private static final CauldronBehavior.CauldronBehaviorMap INTERACTIONS = CauldronBehavior.createMap("mana");
 	private static final CauldronBehavior POUR_MANA = (state, world, pos, player, hand, stack) -> {
 		if (state.get(LeveledCauldronBlock.LEVEL) == 3)
-			return ItemActionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+			return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
 
 		if (!world.isClient()) {
 			player.setStackInHand(hand, ItemUsage.exchangeStack(stack, player, new ItemStack(ModItems.EMBELLISHED_GLASS_BOTTLE)));
@@ -38,9 +36,11 @@ public class ManaCauldronBlock extends LeveledCauldronBlock implements BlockEnti
 			world.setBlockState(pos, state.cycle(LeveledCauldronBlock.LEVEL));
 			world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_EMPTY, SoundCategory.BLOCKS, 1.0F, 1.0F);
 			world.emitGameEvent(null, GameEvent.FLUID_PLACE, pos);
+
+			return ActionResult.SUCCESS;
 		}
 
-		return ItemActionResult.success(world.isClient());
+		return ActionResult.SUCCESS;
 	};
 	private static final CauldronBehavior SCOOP_MANA = (state, world, pos, player, hand, stack) -> {
 		if (!world.isClient()) {
@@ -52,7 +52,7 @@ public class ManaCauldronBlock extends LeveledCauldronBlock implements BlockEnti
 			world.emitGameEvent(null, GameEvent.FLUID_PICKUP, pos);
 		}
 
-		return ItemActionResult.success(world.isClient());
+		return ActionResult.SUCCESS;
 	};
 	private static final CauldronBehavior EMPTY_POUR_MANA = (state, world, pos, player, hand, stack) -> {
 		if (!world.isClient()) {
@@ -64,7 +64,7 @@ public class ManaCauldronBlock extends LeveledCauldronBlock implements BlockEnti
 			world.emitGameEvent(null, GameEvent.FLUID_PLACE, pos);
 		}
 
-		return ItemActionResult.success(world.isClient());
+		return ActionResult.SUCCESS;
 	};
 	private static final CauldronBehavior FAIL_SCOOP_MANA = (state, world, pos, player, hand, stack) -> {
 		if (!world.isClient()) {
@@ -72,7 +72,7 @@ public class ManaCauldronBlock extends LeveledCauldronBlock implements BlockEnti
 			world.playSound(null, pos, SoundEvents.BLOCK_GLASS_BREAK, SoundCategory.BLOCKS, 1.0F, 1.0F);
 		}
 
-		return ItemActionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
+		return ActionResult.FAIL;
 	};
 
 	public static void init() {
@@ -83,7 +83,7 @@ public class ManaCauldronBlock extends LeveledCauldronBlock implements BlockEnti
 	}
 
 	public ManaCauldronBlock() {
-		super(Biome.Precipitation.NONE, INTERACTIONS, Settings.copy(Blocks.CAULDRON));
+		super(Biome.Precipitation.NONE, INTERACTIONS, Settings.copy(Blocks.CAULDRON).registryKey(ModBlocks.KEY_MANA_CAULDRON));
 	}
 
 	@Override

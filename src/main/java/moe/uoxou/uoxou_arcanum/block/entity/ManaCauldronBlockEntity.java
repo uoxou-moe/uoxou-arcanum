@@ -9,6 +9,8 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.recipe.ServerRecipeManager;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
@@ -32,8 +34,12 @@ public class ManaCauldronBlockEntity extends BlockEntity {
 				.toArray(ItemStack[]::new);
 		IAlchemyRecipeInput input = new AlchemyRecipeInput(stacks);
 
-		world.getRecipeManager()
-				.getFirstMatch(ModRecipeTypes.ALCHEMY, input, world)
+		ServerRecipeManager.MatchGetter<IAlchemyRecipeInput, IAlchemyRecipe> matchGetter = ServerRecipeManager.createCachedMatchGetter(
+				ModRecipeTypes.ALCHEMY
+		);
+
+		matchGetter
+				.getFirstMatch(input, (ServerWorld) world)
 				.ifPresent(r -> {
 					this.startCooking(r, input, world);
 					r.value().getIngredients().forEach(ing -> {

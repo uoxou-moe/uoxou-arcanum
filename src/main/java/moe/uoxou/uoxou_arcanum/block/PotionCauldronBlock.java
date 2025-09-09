@@ -11,6 +11,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCollisionHandler;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemUsage;
@@ -23,7 +24,7 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
-import net.minecraft.util.ItemActionResult;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -35,11 +36,11 @@ import java.util.Optional;
 public class PotionCauldronBlock extends LeveledCauldronBlock implements BlockEntityProvider {
 	private static final CauldronBehavior.CauldronBehaviorMap INTERACTIONS = CauldronBehavior.createMap("potion");
 	private static final CauldronBehavior POUR_POTION = (state, world, pos, player, hand, stack) -> {
-		if (state.get(LeveledCauldronBlock.LEVEL) == 3) return ItemActionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-		if (!(world.getBlockEntity(pos) instanceof PotionCauldronBlockEntity blockEntity)) return ItemActionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		if (state.get(LeveledCauldronBlock.LEVEL) == 3) return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+		if (!(world.getBlockEntity(pos) instanceof PotionCauldronBlockEntity blockEntity)) return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
 
 		@Nullable PotionContentsComponent potionContentsComponent = stack.get(DataComponentTypes.POTION_CONTENTS);
-		if (potionContentsComponent == null || potionContentsComponent.potion().filter(p -> p.matchesKey(blockEntity.getPotion().orElse(null))).isEmpty()) return ItemActionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		if (potionContentsComponent == null || potionContentsComponent.potion().filter(p -> p.matchesKey(blockEntity.getPotion().orElse(null))).isEmpty()) return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
 
 		if (!world.isClient()) {
 			player.setStackInHand(hand, ItemUsage.exchangeStack(stack, player, Items.GLASS_BOTTLE.getDefaultStack()));
@@ -50,12 +51,12 @@ public class PotionCauldronBlock extends LeveledCauldronBlock implements BlockEn
 			world.emitGameEvent(null, GameEvent.FLUID_PLACE, pos);
 		}
 
-		return ItemActionResult.success(world.isClient());
+		return ActionResult.SUCCESS;
 	};
 	private static final CauldronBehavior SCOOP_POTION = (state, world, pos, player, hand, stack) -> {
-		if (!(world.getBlockEntity(pos) instanceof PotionCauldronBlockEntity blockEntity)) return ItemActionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		if (!(world.getBlockEntity(pos) instanceof PotionCauldronBlockEntity blockEntity)) return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
 		Optional<RegistryKey<Potion>> potion = blockEntity.getPotion();
-		if (potion.isEmpty()) return ItemActionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		if (potion.isEmpty()) return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
 
 		if (!world.isClient()) {
 			player.setStackInHand(hand, ItemUsage.exchangeStack(stack, player, PotionUtils.createPotionStack(potion.get())));
@@ -66,13 +67,13 @@ public class PotionCauldronBlock extends LeveledCauldronBlock implements BlockEn
 			world.emitGameEvent(null, GameEvent.FLUID_PICKUP, pos);
 		}
 
-		return ItemActionResult.success(world.isClient());
+		return ActionResult.SUCCESS;
 	};
 	private static final CauldronBehavior EMPTY_POUR_POTION = (state, world, pos, player, hand, stack) -> {
 		@Nullable PotionContentsComponent potionContentsComponent = stack.get(DataComponentTypes.POTION_CONTENTS);
-		if (potionContentsComponent == null || potionContentsComponent.matches(Potions.WATER)) return ItemActionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		if (potionContentsComponent == null || potionContentsComponent.matches(Potions.WATER)) return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
 		Optional<RegistryEntry<Potion>> potion = potionContentsComponent.potion();
-		if (potion.isEmpty()) return ItemActionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		if (potion.isEmpty()) return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
 
 		if (!world.isClient()) {
 			player.setStackInHand(hand, ItemUsage.exchangeStack(stack, player, Items.GLASS_BOTTLE.getDefaultStack()));
@@ -87,7 +88,7 @@ public class PotionCauldronBlock extends LeveledCauldronBlock implements BlockEn
 			world.emitGameEvent(null, GameEvent.FLUID_PLACE, pos);
 		}
 
-		return ItemActionResult.success(world.isClient());
+		return ActionResult.SUCCESS;
 	};
 
 	public static void init() {
@@ -97,20 +98,20 @@ public class PotionCauldronBlock extends LeveledCauldronBlock implements BlockEn
 	}
 
 	public PotionCauldronBlock() {
-		super(Biome.Precipitation.NONE , INTERACTIONS, Settings.copy(Blocks.CAULDRON));
+		super(Biome.Precipitation.NONE , INTERACTIONS, Settings.copy(Blocks.CAULDRON).registryKey(ModBlocks.KEY_POTION_CAULDRON));
 	}
 
 	@Override
-	protected void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+	protected void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity, EntityCollisionHandler handler) {
 		if (!world.isClient() && entity instanceof LivingEntity living && world.getBlockEntity(pos) instanceof PotionCauldronBlockEntity blockEntity) {
-			blockEntity.getPotion().map(key -> Registries.POTION.entryOf(key).value())
+			blockEntity.getPotion().map(Registries.POTION::get)
 					.stream()
 					.flatMap(p -> p.getEffects().stream())
 					.filter(e -> !e.getEffectType().value().isInstant())
 					.forEach(e -> living.addStatusEffect(new StatusEffectInstance(e.getEffectType(), 20, e.getAmplifier(), true, true)));
 		}
 
-		super.onEntityCollision(state, world, pos, entity);
+		super.onEntityCollision(state, world, pos, entity, handler);
 	}
 
 	@Nullable

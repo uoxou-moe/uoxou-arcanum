@@ -16,7 +16,7 @@ public class AlchemyRecipeInput implements IAlchemyRecipeInput {
 	}
 
 	@Override
-	public int getSize() {
+	public int size() {
 		return this.inputs.size();
 	}
 }

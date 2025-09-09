@@ -2,17 +2,15 @@ package moe.uoxou.uoxou_arcanum.recipe.alchemy;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import moe.uoxou.uoxou_arcanum.UoxoUArcanum;
 import moe.uoxou.uoxou_arcanum.recipe.ModRecipeSerializers;
 import moe.uoxou.uoxou_arcanum.recipe.ModRecipeTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.recipe.*;
+import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 
 import java.util.Iterator;
@@ -39,19 +37,29 @@ public class AlchemyRecipe implements IAlchemyRecipe {
 	}
 
 	@Override
-	public DefaultedList<Ingredient> getIngredients() {
-		return DefaultedList.copyOf(Ingredient.EMPTY, this.ingredients.toArray(new Ingredient[0]));
+	public IngredientPlacement getIngredientPlacement() {
+		return IngredientPlacement.forShapeless(this.ingredients.stream().toList());
+	}
+
+	@Override
+	public List<Ingredient> getIngredients() {
+		return this.ingredients.stream().toList();
+	}
+
+	@Override
+	public RecipeBookCategory getRecipeBookCategory() {
+		return null;
 	}
 
 	@Override
 	public boolean matches(IAlchemyRecipeInput input, World world) {
-		if (input.getSize() != this.ingredients.size()) {
+		if (input.size() != this.ingredients.size()) {
 			return false;
 		}
 
 		Set<Ingredient> remaining = new java.util.HashSet<>(this.ingredients);
 
-		for (int i = 0; i < input.getSize(); i++) {
+		for (int i = 0; i < input.size(); i++) {
 			ItemStack stack = input.getStackInSlot(i);
 
 			boolean matched = false;
@@ -78,28 +86,18 @@ public class AlchemyRecipe implements IAlchemyRecipe {
 	}
 
 	@Override
-	public boolean fits(int width, int height) {
-		return true;
+	public RecipeSerializer<? extends Recipe<IAlchemyRecipeInput>> getSerializer() {
+		return ModRecipeSerializers.ALCHEMY;
+	}
+
+	@Override
+	public RecipeType<? extends Recipe<IAlchemyRecipeInput>> getType() {
+		return ModRecipeTypes.ALCHEMY;
 	}
 
 	@Override
 	public ItemStack getResult() {
 		return this.result;
-	}
-
-	@Override
-	public ItemStack getResult(RegistryWrapper.WrapperLookup registriesLookup) {
-		return this.result;
-	}
-
-	@Override
-	public RecipeSerializer<?> getSerializer() {
-		return ModRecipeSerializers.ALCHEMY;
-	}
-
-	@Override
-	public RecipeType<?> getType() {
-		return ModRecipeTypes.ALCHEMY;
 	}
 
 	public static class Serializer implements RecipeSerializer<IAlchemyRecipe> {
@@ -108,10 +106,16 @@ public class AlchemyRecipe implements IAlchemyRecipe {
 
 		public Serializer() {
 			this.codec = RecordCodecBuilder.mapCodec(instance -> instance.group(
-					Ingredient.DISALLOW_EMPTY_CODEC.listOf().fieldOf("ingredients").forGetter(IAlchemyRecipe::getIngredients),
+					Ingredient.CODEC.listOf().fieldOf("ingredients").forGetter(IAlchemyRecipe::getIngredients),
 					ItemStack.VALIDATED_CODEC.fieldOf("result").forGetter(IAlchemyRecipe::getResult)
 			).apply(instance, AlchemyRecipe::new));
-			this.packetCodec = PacketCodec.ofStatic(Serializer::write, Serializer::read);
+			this.packetCodec = PacketCodec.tuple(
+					Ingredient.PACKET_CODEC.collect(PacketCodecs.toList()),
+					IAlchemyRecipe::getIngredients,
+					ItemStack.PACKET_CODEC,
+					IAlchemyRecipe::getResult,
+					AlchemyRecipe::new
+			);
 		}
 
 		@Override
@@ -122,23 +126,6 @@ public class AlchemyRecipe implements IAlchemyRecipe {
 		@Override
 		public PacketCodec<RegistryByteBuf, IAlchemyRecipe> packetCodec() {
 			return this.packetCodec;
-		}
-
-		private static IAlchemyRecipe read(RegistryByteBuf buffer) {
-			int i = buffer.readVarInt();
-			DefaultedList<Ingredient> ingredients = DefaultedList.ofSize(i, Ingredient.EMPTY);
-			ingredients.replaceAll(empty -> Ingredient.PACKET_CODEC.decode(buffer));
-			ItemStack result = ItemStack.PACKET_CODEC.decode(buffer);
-
-			return new AlchemyRecipe(result, ingredients.toArray(new Ingredient[0]));
-		}
-
-		private static void write(RegistryByteBuf buffer, IAlchemyRecipe recipe) {
-			buffer.writeVarInt(recipe.getIngredients().size());
-			recipe.getIngredients().forEach(ingredient -> {
-				Ingredient.PACKET_CODEC.encode(buffer, ingredient);
-			});
-			ItemStack.PACKET_CODEC.encode(buffer, recipe.getResult());
 		}
 	}
 }
