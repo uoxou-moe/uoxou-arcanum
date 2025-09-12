@@ -2,10 +2,7 @@ package moe.uoxou.uoxou_arcanum.block;
 
 import moe.uoxou.uoxou_arcanum.block.entity.ManaCauldronBlockEntity;
 import moe.uoxou.uoxou_arcanum.item.ModItems;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.LeveledCauldronBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.cauldron.CauldronBehavior;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -103,4 +100,11 @@ public class ManaCauldronBlock extends LeveledCauldronBlock implements BlockEnti
 	public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
 		return new ManaCauldronBlockEntity(pos, state);
 	}
+
+//	@Override
+//	protected BlockRenderType getRenderType(BlockState state) {
+//		return BlockRenderType.INVISIBLE;
+//	}
+
+
 }

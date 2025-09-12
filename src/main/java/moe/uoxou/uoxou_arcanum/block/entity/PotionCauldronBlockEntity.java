@@ -20,10 +20,17 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib.animatable.GeoBlockEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animatable.manager.AnimatableManager;
+import software.bernie.geckolib.animatable.processing.AnimationController;
+import software.bernie.geckolib.animation.PlayState;
+import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.Optional;
 
-public class PotionCauldronBlockEntity extends BlockEntity {
+public class PotionCauldronBlockEntity extends BlockEntity implements GeoBlockEntity, ILeveledCauldronBlockEntity {
 	@Nullable private RegistryKey<Potion> potion;
 
 	public PotionCauldronBlockEntity(BlockPos pos, BlockState state) {
@@ -87,5 +94,56 @@ public class PotionCauldronBlockEntity extends BlockEntity {
 	@Override
 	public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registryLookup) {
 		return this.createComponentlessNbt(registryLookup);
+	}
+
+	public Optional<BlockState> getBlock() {
+		return Optional.ofNullable(this.world).map(w -> w.getBlockState(this.pos));
+	}
+
+	// GeckoLib
+	private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+
+	private static final RawAnimation POUR_ANIMS = RawAnimation.begin().thenPlay("animation.mana_cauldron.pour");
+	private static final RawAnimation SCOOP_ANIMS = RawAnimation.begin().thenPlay("animation.mana_cauldron.scoop");
+	private static final RawAnimation RIPPLE_ANIMS = RawAnimation.begin().thenPlay("animation.mana_cauldron.ripple");
+
+	private int lastLevelForPourAnim = 0;
+	private int lastLevelForRippleAnim = 0;
+	@Override
+	public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
+		controllerRegistrar.add(new AnimationController<>("pour", animTest -> {
+			this.getBlock().ifPresent(b -> {
+				if (b.contains(net.minecraft.block.LeveledCauldronBlock.LEVEL)) {
+					int newLevel = b.get(net.minecraft.block.LeveledCauldronBlock.LEVEL);
+
+					if (this.lastLevelForPourAnim < newLevel) {
+						animTest.resetCurrentAnimation();
+						animTest.setAnimation(POUR_ANIMS);
+					} else if (this.lastLevelForPourAnim > newLevel) {
+						animTest.resetCurrentAnimation();
+						animTest.setAnimation(SCOOP_ANIMS);
+					}
+
+					this.lastLevelForPourAnim = newLevel;
+				}
+			});
+			return PlayState.CONTINUE;
+		})).add(new AnimationController<>("ripple", animTest -> {
+			this.getBlock().ifPresent(b -> {
+				if (b.contains(net.minecraft.block.LeveledCauldronBlock.LEVEL)) {
+					if (this.lastLevelForRippleAnim != b.get(net.minecraft.block.LeveledCauldronBlock.LEVEL)) {
+						this.lastLevelForRippleAnim = b.get(net.minecraft.block.LeveledCauldronBlock.LEVEL);
+						animTest.resetCurrentAnimation();
+					}
+				}
+			});
+
+			return animTest.setAndContinue(RIPPLE_ANIMS);
+		}));
+	}
+
+	@Override
+	public AnimatableInstanceCache getAnimatableInstanceCache() {
+		return this.cache;
 	}
 }
