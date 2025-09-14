@@ -1,5 +1,6 @@
 package moe.uoxou.uoxou_arcanum.client.renderer.block;
 
+import moe.uoxou.uoxou_arcanum.UoxoUArcanum;
 import moe.uoxou.uoxou_arcanum.block.entity.PotionCauldronBlockEntity;
 import moe.uoxou.uoxou_arcanum.client.UoxoUArcanumClient;
 import moe.uoxou.uoxou_arcanum.client.model.block.PotionCauldronModel;
@@ -11,7 +12,9 @@ import software.bernie.geckolib.renderer.base.GeoRenderState;
 
 public class PotionCauldronRenderer extends GeoBlockRenderer<PotionCauldronBlockEntity> {
 	public PotionCauldronRenderer(BlockEntityRendererFactory.Context context) {
-		super(new PotionCauldronModel());
+		super(new PotionCauldronModel()
+				.withAltModel(UoxoUArcanum.identifier("mana_cauldron"))
+				.withAltAnimations(UoxoUArcanum.identifier("mana_cauldron")));
 
 		this.addRenderLayer(new PotionLayer<>(this));
 	}

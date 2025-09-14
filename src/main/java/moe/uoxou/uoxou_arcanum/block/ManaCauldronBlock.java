@@ -1,8 +1,13 @@
 package moe.uoxou.uoxou_arcanum.block;
 
+import moe.uoxou.uoxou_arcanum.block.entity.AbstractAlchemyCauldronBlockEntity;
 import moe.uoxou.uoxou_arcanum.block.entity.ManaCauldronBlockEntity;
+import moe.uoxou.uoxou_arcanum.block.entity.ModBlockEntities;
 import moe.uoxou.uoxou_arcanum.item.ModItems;
-import net.minecraft.block.*;
+import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.LeveledCauldronBlock;
 import net.minecraft.block.cauldron.CauldronBehavior;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -31,6 +36,7 @@ public class ManaCauldronBlock extends LeveledCauldronBlock implements BlockEnti
 			player.incrementStat(Stats.USE_CAULDRON);
 			player.incrementStat(Stats.USED.getOrCreateStat(stack.getItem()));
 			world.setBlockState(pos, state.cycle(LeveledCauldronBlock.LEVEL));
+			world.getBlockEntity(pos, ModBlockEntities.MANA_CAULDRON).ifPresent(AbstractAlchemyCauldronBlockEntity::triggerPourAnimation);
 			world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_EMPTY, SoundCategory.BLOCKS, 1.0F, 1.0F);
 			world.emitGameEvent(null, GameEvent.FLUID_PLACE, pos);
 
@@ -45,6 +51,7 @@ public class ManaCauldronBlock extends LeveledCauldronBlock implements BlockEnti
 			player.incrementStat(Stats.USE_CAULDRON);
 			player.incrementStat(Stats.USED.getOrCreateStat(stack.getItem()));
 			LeveledCauldronBlock.decrementFluidLevel(state, world, pos);
+			world.getBlockEntity(pos, ModBlockEntities.MANA_CAULDRON).ifPresent(AbstractAlchemyCauldronBlockEntity::triggerScoopAnimation);
 			world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.BLOCKS, 1.0F, 1.0F);
 			world.emitGameEvent(null, GameEvent.FLUID_PICKUP, pos);
 		}
@@ -57,6 +64,7 @@ public class ManaCauldronBlock extends LeveledCauldronBlock implements BlockEnti
 			player.incrementStat(Stats.USE_CAULDRON);
 			player.incrementStat(Stats.USED.getOrCreateStat(stack.getItem()));
 			world.setBlockState(pos, ModBlocks.MANA_CAULDRON.getDefaultState());
+			world.getBlockEntity(pos, ModBlockEntities.MANA_CAULDRON).ifPresent(AbstractAlchemyCauldronBlockEntity::triggerPourAnimation);
 			world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_EMPTY, SoundCategory.BLOCKS, 1.0F, 1.0F);
 			world.emitGameEvent(null, GameEvent.FLUID_PLACE, pos);
 		}
@@ -100,11 +108,4 @@ public class ManaCauldronBlock extends LeveledCauldronBlock implements BlockEnti
 	public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
 		return new ManaCauldronBlockEntity(pos, state);
 	}
-
-//	@Override
-//	protected BlockRenderType getRenderType(BlockState state) {
-//		return BlockRenderType.INVISIBLE;
-//	}
-
-
 }

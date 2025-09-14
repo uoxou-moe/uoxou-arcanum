@@ -1,5 +1,7 @@
 package moe.uoxou.uoxou_arcanum.block;
 
+import moe.uoxou.uoxou_arcanum.block.entity.AbstractAlchemyCauldronBlockEntity;
+import moe.uoxou.uoxou_arcanum.block.entity.ModBlockEntities;
 import moe.uoxou.uoxou_arcanum.block.entity.PotionCauldronBlockEntity;
 import moe.uoxou.uoxou_arcanum.util.PotionUtils;
 import net.minecraft.block.BlockEntityProvider;
@@ -47,6 +49,7 @@ public class PotionCauldronBlock extends LeveledCauldronBlock implements BlockEn
 			player.incrementStat(Stats.USE_CAULDRON);
 			player.incrementStat(Stats.USED.getOrCreateStat(stack.getItem()));
 			world.setBlockState(pos, state.cycle(LeveledCauldronBlock.LEVEL));
+			world.getBlockEntity(pos, ModBlockEntities.POTION_CAULDRON).ifPresent(AbstractAlchemyCauldronBlockEntity::triggerPourAnimation);
 			world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_EMPTY, SoundCategory.BLOCKS, 1.0F, 1.0F);
 			world.emitGameEvent(null, GameEvent.FLUID_PLACE, pos);
 		}
@@ -63,6 +66,7 @@ public class PotionCauldronBlock extends LeveledCauldronBlock implements BlockEn
 			player.incrementStat(Stats.USE_CAULDRON);
 			player.incrementStat(Stats.USED.getOrCreateStat(stack.getItem()));
 			LeveledCauldronBlock.decrementFluidLevel(state, world, pos);
+			world.getBlockEntity(pos, ModBlockEntities.POTION_CAULDRON).ifPresent(AbstractAlchemyCauldronBlockEntity::triggerScoopAnimation);
 			world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.BLOCKS, 1.0F, 1.0F);
 			world.emitGameEvent(null, GameEvent.FLUID_PICKUP, pos);
 		}
@@ -84,6 +88,7 @@ public class PotionCauldronBlock extends LeveledCauldronBlock implements BlockEn
 				potionContentsComponent.potion().flatMap(RegistryEntry::getKey)
 						.ifPresent(blockEntity::setPotion);
 			}
+			world.getBlockEntity(pos, ModBlockEntities.POTION_CAULDRON).ifPresent(AbstractAlchemyCauldronBlockEntity::triggerPourAnimation);
 			world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_EMPTY, SoundCategory.BLOCKS, 1.0F, 1.0F);
 			world.emitGameEvent(null, GameEvent.FLUID_PLACE, pos);
 		}

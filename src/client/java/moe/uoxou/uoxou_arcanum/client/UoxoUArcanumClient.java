@@ -1,6 +1,6 @@
 package moe.uoxou.uoxou_arcanum.client;
 
-import moe.uoxou.uoxou_arcanum.block.entity.ILeveledCauldronBlockEntity;
+import moe.uoxou.uoxou_arcanum.block.entity.IAlchemyCauldronBlockEntity;
 import moe.uoxou.uoxou_arcanum.block.entity.ModBlockEntities;
 import moe.uoxou.uoxou_arcanum.client.renderer.block.ManaCauldronRenderer;
 import moe.uoxou.uoxou_arcanum.client.renderer.block.PotionCauldronRenderer;
@@ -19,6 +19,6 @@ public class UoxoUArcanumClient implements ClientModInitializer {
 		BlockEntityRendererRegistryImpl.register(ModBlockEntities.MANA_CAULDRON, ManaCauldronRenderer::new);
 		BlockEntityRendererRegistryImpl.register(ModBlockEntities.POTION_CAULDRON, PotionCauldronRenderer::new);
 
-		MolangQueries.<ILeveledCauldronBlockEntity>setActorVariable("query.uoxou_arcanum.content_level", actor -> actor.animatable().getLevel());
+		MolangQueries.<IAlchemyCauldronBlockEntity>setActorVariable("query.uoxou_arcanum.content_level", actor -> actor.animatable().getContentLevel());
 	}
 }

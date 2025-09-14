@@ -5,7 +5,6 @@ import moe.uoxou.uoxou_arcanum.recipe.alchemy.AlchemyRecipeInput;
 import moe.uoxou.uoxou_arcanum.recipe.alchemy.IAlchemyRecipe;
 import moe.uoxou.uoxou_arcanum.recipe.alchemy.IAlchemyRecipeInput;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeEntry;
@@ -17,26 +16,21 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.animatable.GeoBlockEntity;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animatable.manager.AnimatableManager;
-import software.bernie.geckolib.animatable.processing.AnimationController;
-import software.bernie.geckolib.animation.PlayState;
-import software.bernie.geckolib.animation.RawAnimation;
-import software.bernie.geckolib.util.GeckoLibUtil;
 
-import java.util.Optional;
-
-public class ManaCauldronBlockEntity extends BlockEntity implements GeoBlockEntity, ILeveledCauldronBlockEntity {
+public class ManaCauldronBlockEntity extends AbstractAlchemyCauldronBlockEntity {
 	public int cookingTicks = 0;
 	@Nullable public IAlchemyRecipeInput ingredients = null;
 	public ItemStack result = ItemStack.EMPTY;
+
+	private boolean popAnimFlag = false;
 
 	public ManaCauldronBlockEntity(BlockPos pos, BlockState state) {
 		super(ModBlockEntities.MANA_CAULDRON, pos, state);
 	}
 
 	public void tick(World world, BlockPos pos) {
+		this.tickForRipple();
+
 		ItemStack[] stacks = world.getEntitiesByClass(ItemEntity.class, new Box(pos), (i) -> true)
 				.stream()
 				.map(ItemEntity::getStack)
@@ -65,6 +59,12 @@ public class ManaCauldronBlockEntity extends BlockEntity implements GeoBlockEnti
 			this.cookingTicks--;
 		}
 
+		// popアニメーションが開始してからpop動作を行うまで15ticks
+		if (this.cookingTicks < 15 && this.popAnimFlag) {
+			this.triggerPopAnimation();
+			this.popAnimFlag = false;
+		}
+
 		if (this.cookingTicks == 0 && this.ingredients != null) {
 			this.finishCooking(world, pos);
 		}
@@ -74,6 +74,8 @@ public class ManaCauldronBlockEntity extends BlockEntity implements GeoBlockEnti
 		this.cookingTicks = 40;
 		this.ingredients = input;
 		this.result = recipe.value().craft(input, world.getRegistryManager());
+
+		this.popAnimFlag = true;
 	}
 
 	public void finishCooking(World world, BlockPos pos) {
@@ -87,56 +89,5 @@ public class ManaCauldronBlockEntity extends BlockEntity implements GeoBlockEnti
 		this.cookingTicks = 0;
 		this.ingredients = null;
 		this.result = ItemStack.EMPTY;
-	}
-
-	public Optional<BlockState> getBlock() {
-		return Optional.ofNullable(this.world).map(w -> w.getBlockState(this.pos));
-	}
-
-	// GeckoLib
-	private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
-
-	private static final RawAnimation POUR_ANIMS = RawAnimation.begin().thenPlay("animation.mana_cauldron.pour");
-	private static final RawAnimation SCOOP_ANIMS = RawAnimation.begin().thenPlay("animation.mana_cauldron.scoop");
-	private static final RawAnimation RIPPLE_ANIMS = RawAnimation.begin().thenPlay("animation.mana_cauldron.ripple");
-
-	private int lastLevelForPourAnim = 0;
-	private int lastLevelForRippleAnim = 0;
-	@Override
-	public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
-		controllerRegistrar.add(new AnimationController<>("pour", animTest -> {
-			this.getBlock().ifPresent(b -> {
-				if (b.contains(net.minecraft.block.LeveledCauldronBlock.LEVEL)) {
-					int newLevel = b.get(net.minecraft.block.LeveledCauldronBlock.LEVEL);
-
-					if (this.lastLevelForPourAnim < newLevel) {
-						animTest.resetCurrentAnimation();
-						animTest.setAnimation(POUR_ANIMS);
-					} else if (this.lastLevelForPourAnim > newLevel) {
-						animTest.resetCurrentAnimation();
-						animTest.setAnimation(SCOOP_ANIMS);
-					}
-
-					this.lastLevelForPourAnim = newLevel;
-				}
-			});
-			return PlayState.CONTINUE;
-		})).add(new AnimationController<>("ripple", animTest -> {
-			this.getBlock().ifPresent(b -> {
-				if (b.contains(net.minecraft.block.LeveledCauldronBlock.LEVEL)) {
-					if (this.lastLevelForRippleAnim != b.get(net.minecraft.block.LeveledCauldronBlock.LEVEL)) {
-						this.lastLevelForRippleAnim = b.get(net.minecraft.block.LeveledCauldronBlock.LEVEL);
-						animTest.resetCurrentAnimation();
-					}
-				}
-			});
-
-			return animTest.setAndContinue(RIPPLE_ANIMS);
-		}));
-	}
-
-	@Override
-	public AnimatableInstanceCache getAnimatableInstanceCache() {
-		return this.cache;
 	}
 }
