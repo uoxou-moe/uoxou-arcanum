@@ -5,9 +5,13 @@ import net.minecraft.util.collection.DefaultedList;
 
 public class AlchemyRecipeInput implements IAlchemyRecipeInput {
 	public DefaultedList<ItemStack> inputs;
+	private final IAlchemyRecipe.HeatType heatType;
+	private final int juiceLevel;
 
-	public AlchemyRecipeInput(ItemStack... inputs) {
+	public AlchemyRecipeInput(IAlchemyRecipe.HeatType heatType, int juiceLevel, ItemStack... inputs) {
 		this.inputs = DefaultedList.copyOf(ItemStack.EMPTY, inputs);
+		this.heatType = heatType;
+		this.juiceLevel = juiceLevel;
 	}
 
 	@Override
@@ -18,5 +22,15 @@ public class AlchemyRecipeInput implements IAlchemyRecipeInput {
 	@Override
 	public int size() {
 		return this.inputs.size();
+	}
+
+	@Override
+	public IAlchemyRecipe.HeatType getHeatType() {
+		return this.heatType;
+	}
+
+	@Override
+	public int getJuiceLevel() {
+		return this.juiceLevel;
 	}
 }

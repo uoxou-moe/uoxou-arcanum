@@ -4,7 +4,9 @@ import moe.uoxou.uoxou_arcanum.recipe.ModRecipeTypes;
 import moe.uoxou.uoxou_arcanum.recipe.alchemy.AlchemyRecipeInput;
 import moe.uoxou.uoxou_arcanum.recipe.alchemy.IAlchemyRecipe;
 import moe.uoxou.uoxou_arcanum.recipe.alchemy.IAlchemyRecipeInput;
+import moe.uoxou.uoxou_arcanum.recipe.alchemy.ManaAlchemyRecipe;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.LeveledCauldronBlock;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeEntry;
@@ -21,6 +23,7 @@ public class ManaCauldronBlockEntity extends AbstractAlchemyCauldronBlockEntity 
 	public int cookingTicks = 0;
 	@Nullable public IAlchemyRecipeInput ingredients = null;
 	public ItemStack result = ItemStack.EMPTY;
+	@Nullable private ManaAlchemyRecipe cookingRecipe = null;
 
 	private boolean popAnimFlag = false;
 
@@ -31,29 +34,31 @@ public class ManaCauldronBlockEntity extends AbstractAlchemyCauldronBlockEntity 
 	public void tick(World world, BlockPos pos) {
 		this.tickForRipple();
 
-		ItemStack[] stacks = world.getEntitiesByClass(ItemEntity.class, new Box(pos), (i) -> true)
-				.stream()
-				.map(ItemEntity::getStack)
-				.toArray(ItemStack[]::new);
-		IAlchemyRecipeInput input = new AlchemyRecipeInput(stacks);
+		if (this.cookingTicks == 0 && this.ingredients == null) {
+			ItemStack[] stacks = world.getEntitiesByClass(ItemEntity.class, new Box(pos), (i) -> true)
+					.stream()
+					.map(ItemEntity::getStack)
+					.toArray(ItemStack[]::new);
+			IAlchemyRecipeInput input = new AlchemyRecipeInput(IAlchemyRecipe.HeatType.NONE, this.getContentLevel(), stacks);
 
-		ServerRecipeManager.MatchGetter<IAlchemyRecipeInput, IAlchemyRecipe> matchGetter = ServerRecipeManager.createCachedMatchGetter(
-				ModRecipeTypes.ALCHEMY
-		);
+			ServerRecipeManager.MatchGetter<IAlchemyRecipeInput, ManaAlchemyRecipe> matchGetter = ServerRecipeManager.createCachedMatchGetter(
+					ModRecipeTypes.MANA_ALCHEMY
+			);
 
-		matchGetter
-				.getFirstMatch(input, (ServerWorld) world)
-				.ifPresent(r -> {
-					this.startCooking(r, input, world);
-					r.value().getIngredients().forEach(ing -> {
-						for (ItemStack stack : stacks) {
-							if (ing.test(stack)) {
-								stack.decrement(1);
-								break;
+			matchGetter
+					.getFirstMatch(input, (ServerWorld) world)
+					.ifPresent(r -> {
+						this.startCooking(r, input, world);
+						r.value().getIngredients().forEach(ing -> {
+							for (ItemStack stack : stacks) {
+								if (ing.test(stack)) {
+									stack.decrement(1);
+									break;
+								}
 							}
-						}
+						});
 					});
-				});
+		}
 
 		if (this.cookingTicks > 0) {
 			this.cookingTicks--;
@@ -70,24 +75,41 @@ public class ManaCauldronBlockEntity extends AbstractAlchemyCauldronBlockEntity 
 		}
 	}
 
-	public void startCooking(RecipeEntry<IAlchemyRecipe> recipe, IAlchemyRecipeInput input, World world) {
+	public void startCooking(RecipeEntry<? extends IAlchemyRecipe> recipe, IAlchemyRecipeInput input, World world) {
 		this.cookingTicks = 40;
 		this.ingredients = input;
 		this.result = recipe.value().craft(input, world.getRegistryManager());
+		this.cookingRecipe = (ManaAlchemyRecipe) recipe.value();
 
 		this.popAnimFlag = true;
 	}
 
 	public void finishCooking(World world, BlockPos pos) {
-		if (this.result.isEmpty()) return;
+		if (this.result.isEmpty() || this.cookingRecipe == null) return;
 
-		ItemEntity entity = new ItemEntity(world, pos.getX() + 0.5, pos.getY() + 1, pos.getZ(), this.result);
-		double random = world.random.nextDouble() * 2.0 * Math.PI;
-		entity.addVelocity(Math.sin(random) * 0.1, 0.1, Math.cos(random) * 0.1);
-		world.spawnEntity(entity);
+		//再チェック
+
+		ItemEntity itemEntity = new ItemEntity(
+				world,
+				pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
+				this.result
+		);
+
+		// 速度: X/Zはほんの少しランダム, Yはより上向き
+		itemEntity.setVelocity(
+				world.random.nextTriangular(0.0, 0.5),   // 横ぶれ小さめ
+				world.random.nextTriangular(0.5, 0.1),    // 上方向を強めに
+				world.random.nextTriangular(0.0, 0.5)
+		);
+
+		world.spawnEntity(itemEntity);
+		for (int i = 0; i < this.cookingRecipe.getJuiceCost(); i++) {
+			LeveledCauldronBlock.decrementFluidLevel(world.getBlockState(pos), world, pos);
+		}
 		world.playSound(null, pos, SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.BLOCKS, 1.0f, 0.5f);
 		this.cookingTicks = 0;
 		this.ingredients = null;
+		this.cookingRecipe = null;
 		this.result = ItemStack.EMPTY;
 	}
 }

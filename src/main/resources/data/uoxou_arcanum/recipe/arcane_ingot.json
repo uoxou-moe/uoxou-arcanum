@@ -1,9 +1,26 @@
 {
-	"type": "uoxou_arcanum:alchemy",
+	"type": "uoxou_arcanum:mana_alchemy",
 	"ingredients": [
 		"minecraft:gold_ingot"
 	],
-	"result": {
-		"id": "minecraft:diamond"
-	}
+	"result": [
+		{
+			"item": {
+				"id": "minecraft:netherite_ingot",
+				"count": 1
+			},
+			"weight": 80,
+			"is_failure": false
+		},
+		{
+			"item": {
+				"id": "minecraft:charcoal",
+				"count": 1
+			},
+			"weight": 20,
+			"is_failure": true
+		}
+	],
+	"heat_type": "none",
+	"juice_cost": 2
 }

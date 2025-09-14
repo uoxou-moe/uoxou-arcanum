@@ -1,14 +1,26 @@
 package moe.uoxou.uoxou_arcanum.recipe.alchemy;
 
-import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.IngredientPlacement;
 import net.minecraft.recipe.Recipe;
+import net.minecraft.util.StringIdentifiable;
 
 import java.util.List;
 
 public interface IAlchemyRecipe extends Recipe<IAlchemyRecipeInput> {
-	@Override IngredientPlacement getIngredientPlacement();
 	List<Ingredient> getIngredients();
-	ItemStack getResult();
+	List<IAlchemyResultEntry> getResult();
+	HeatType getHeatType();
+	int getJuiceCost();
+
+	enum HeatType implements StringIdentifiable {
+		NONE,
+		FIRE,
+		SOUL_FIRE,
+		;
+
+		@Override
+		public String asString() {
+			return this.name().toLowerCase();
+		}
+	}
 }
