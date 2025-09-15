@@ -19,6 +19,8 @@ import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class ManaCauldronBlockEntity extends AbstractAlchemyCauldronBlockEntity {
 	public int cookingTicks = 0;
 	@Nullable public IAlchemyRecipeInput ingredients = null;
@@ -39,7 +41,7 @@ public class ManaCauldronBlockEntity extends AbstractAlchemyCauldronBlockEntity 
 					.stream()
 					.map(ItemEntity::getStack)
 					.toArray(ItemStack[]::new);
-			IAlchemyRecipeInput input = new AlchemyRecipeInput(IAlchemyRecipe.HeatType.NONE, this.getContentLevel(), stacks);
+			IAlchemyRecipeInput input = new AlchemyRecipeInput(Objects.requireNonNull(this.getWorld()).getBlockState(pos.down()), this.getContentLevel(), stacks);
 
 			ServerRecipeManager.MatchGetter<IAlchemyRecipeInput, ManaAlchemyRecipe> matchGetter = ServerRecipeManager.createCachedMatchGetter(
 					ModRecipeTypes.MANA_ALCHEMY

@@ -1,16 +1,17 @@
 package moe.uoxou.uoxou_arcanum.recipe.alchemy;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.collection.DefaultedList;
 
 public class AlchemyRecipeInput implements IAlchemyRecipeInput {
 	public DefaultedList<ItemStack> inputs;
-	private final IAlchemyRecipe.HeatType heatType;
+	private final BlockState heatSource;
 	private final int juiceLevel;
 
-	public AlchemyRecipeInput(IAlchemyRecipe.HeatType heatType, int juiceLevel, ItemStack... inputs) {
+	public AlchemyRecipeInput(BlockState heatSource, int juiceLevel, ItemStack... inputs) {
 		this.inputs = DefaultedList.copyOf(ItemStack.EMPTY, inputs);
-		this.heatType = heatType;
+		this.heatSource = heatSource;
 		this.juiceLevel = juiceLevel;
 	}
 
@@ -25,8 +26,8 @@ public class AlchemyRecipeInput implements IAlchemyRecipeInput {
 	}
 
 	@Override
-	public IAlchemyRecipe.HeatType getHeatType() {
-		return this.heatType;
+	public BlockState getHeatSource() {
+		return this.heatSource;
 	}
 
 	@Override

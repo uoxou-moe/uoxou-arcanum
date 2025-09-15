@@ -12,7 +12,7 @@ public class AlchemyResultEntry implements IAlchemyResultEntry {
 	private final int weight;
 	private final boolean isFailure;
 
-	private AlchemyResultEntry(ItemStack item, int weight, boolean isFailure) {
+	public AlchemyResultEntry(ItemStack item, int weight, boolean isFailure) {
 		this.item = item;
 		this.weight = weight;
 		this.isFailure = isFailure;

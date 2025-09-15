@@ -1,5 +1,6 @@
 package moe.uoxou.uoxou_arcanum.recipe.alchemy;
 
+import moe.uoxou.uoxou_arcanum.block.ModBlockTags;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.IngredientPlacement;
@@ -28,7 +29,9 @@ public abstract class AbstractAlchemyRecipe implements IAlchemyRecipe {
 
 	@Override
 	public boolean matches(IAlchemyRecipeInput input, World world) {
-		if (input.getHeatType() != this.heatType) {
+		if (this.heatType == HeatType.FIRE && !input.getHeatSource().isIn(ModBlockTags.ALCHEMY_HEAT_SOURCES)) {
+			return false;
+		} else if (this.heatType == HeatType.SOUL_FIRE && !input.getHeatSource().isIn(ModBlockTags.ALCHEMY_SOUL_SOURCES)) {
 			return false;
 		}
 

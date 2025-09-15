@@ -1,0 +1,9 @@
+{
+  "values": [
+    "minecraft:fire",
+    "minecraft:campfire",
+    "minecraft:lava",
+    "minecraft:magma_block",
+    "#uoxou_arcanum:alchemy_soul_sources"
+  ]
+}

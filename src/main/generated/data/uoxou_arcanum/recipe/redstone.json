@@ -1,0 +1,27 @@
+{
+  "type": "uoxou_arcanum:mana_alchemy",
+  "heat_type": "fire",
+  "ingredients": [
+    "minecraft:redstone",
+    "minecraft:amethyst_shard"
+  ],
+  "juice_cost": 1,
+  "result": [
+    {
+      "is_failure": false,
+      "item": {
+        "count": 2,
+        "id": "minecraft:redstone"
+      },
+      "weight": 90
+    },
+    {
+      "is_failure": true,
+      "item": {
+        "count": 1,
+        "id": "minecraft:redstone"
+      },
+      "weight": 10
+    }
+  ]
+}
