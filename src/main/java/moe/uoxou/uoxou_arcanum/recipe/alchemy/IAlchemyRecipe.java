@@ -6,7 +6,7 @@ import net.minecraft.util.StringIdentifiable;
 
 import java.util.List;
 
-public interface IAlchemyRecipe extends Recipe<IAlchemyRecipeInput> {
+public interface IAlchemyRecipe<I extends IAlchemyRecipeInput> extends Recipe<I> {
 	List<Ingredient> getIngredients();
 	List<IAlchemyResultEntry> getResult();
 	HeatType getHeatType();

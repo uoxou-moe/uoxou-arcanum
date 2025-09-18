@@ -16,7 +16,7 @@ import net.minecraft.util.StringIdentifiable;
 
 import java.util.List;
 
-public class ManaAlchemyRecipe extends AbstractAlchemyRecipe {
+public class ManaAlchemyRecipe extends AbstractAlchemyRecipe<IAlchemyRecipeInput> {
 	public ManaAlchemyRecipe(List<Ingredient> ingredients, List<IAlchemyResultEntry> result, HeatType heatType, int juiceCost) {
 		super(ingredients, result, heatType, juiceCost);
 	}
@@ -31,9 +31,9 @@ public class ManaAlchemyRecipe extends AbstractAlchemyRecipe {
 		return ModRecipeSerializers.MANA_ALCHEMY;
 	}
 
-	public static class Serializer implements RecipeSerializer<IAlchemyRecipe> {
-		private final MapCodec<IAlchemyRecipe> codec;
-		private final PacketCodec<RegistryByteBuf, IAlchemyRecipe> packetCodec;
+	public static class Serializer implements RecipeSerializer<IAlchemyRecipe<IAlchemyRecipeInput>> {
+		private final MapCodec<IAlchemyRecipe<IAlchemyRecipeInput>> codec;
+		private final PacketCodec<RegistryByteBuf, IAlchemyRecipe<IAlchemyRecipeInput>> packetCodec;
 
 		public Serializer() {
 			this.codec = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -56,12 +56,12 @@ public class ManaAlchemyRecipe extends AbstractAlchemyRecipe {
 		}
 
 		@Override
-		public MapCodec<IAlchemyRecipe> codec() {
+		public MapCodec<IAlchemyRecipe<IAlchemyRecipeInput>> codec() {
 			return this.codec;
 		}
 
 		@Override
-		public PacketCodec<RegistryByteBuf, IAlchemyRecipe> packetCodec() {
+		public PacketCodec<RegistryByteBuf, IAlchemyRecipe<IAlchemyRecipeInput>> packetCodec() {
 			return this.packetCodec;
 		}
 	}

@@ -1,14 +1,20 @@
 package moe.uoxou.uoxou_arcanum.block.entity;
 
+import moe.uoxou.uoxou_arcanum.recipe.ModRecipeTypes;
+import moe.uoxou.uoxou_arcanum.recipe.alchemy.IPotionAlchemyRecipeInput;
+import moe.uoxou.uoxou_arcanum.recipe.alchemy.PotionAlchemyRecipe;
+import moe.uoxou.uoxou_arcanum.recipe.alchemy.PotionAlchemyRecipeInput;
 import moe.uoxou.uoxou_arcanum.util.PotionUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.component.ComponentsAccess;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.PotionContentsComponent;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.potion.Potion;
+import net.minecraft.recipe.ServerRecipeManager;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
@@ -22,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
-public class PotionCauldronBlockEntity extends AbstractAlchemyCauldronBlockEntity {
+public class PotionCauldronBlockEntity extends AbstractAlchemyCauldronBlockEntity<PotionAlchemyRecipe, IPotionAlchemyRecipeInput> {
 	@Nullable private RegistryKey<Potion> potion;
 
 	public PotionCauldronBlockEntity(BlockPos pos, BlockState state) {
@@ -86,5 +92,20 @@ public class PotionCauldronBlockEntity extends AbstractAlchemyCauldronBlockEntit
 	@Override
 	public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registryLookup) {
 		return this.createComponentlessNbt(registryLookup);
+	}
+
+	@Override
+	protected IPotionAlchemyRecipeInput toRecipeInput(ItemStack... stack) {
+		return new PotionAlchemyRecipeInput(
+				this.potion,
+				Optional.ofNullable(this.getWorld()).map(w -> w.getBlockState(this.getPos().down())).orElse(null),
+				this.getContentLevel(),
+				stack
+		);
+	}
+
+	@Override
+	protected ServerRecipeManager.MatchGetter<IPotionAlchemyRecipeInput, PotionAlchemyRecipe> getMatchGetter() {
+		return ServerRecipeManager.createCachedMatchGetter(ModRecipeTypes.POTION_ALCHEMY);
 	}
 }

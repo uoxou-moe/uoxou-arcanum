@@ -4,12 +4,11 @@ import moe.uoxou.uoxou_arcanum.block.entity.AbstractAlchemyCauldronBlockEntity;
 import moe.uoxou.uoxou_arcanum.block.entity.ModBlockEntities;
 import moe.uoxou.uoxou_arcanum.block.entity.PotionCauldronBlockEntity;
 import moe.uoxou.uoxou_arcanum.util.PotionUtils;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.LeveledCauldronBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.cauldron.CauldronBehavior;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.entity.Entity;
@@ -123,5 +122,16 @@ public class PotionCauldronBlock extends LeveledCauldronBlock implements BlockEn
 	@Override
 	public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
 		return new PotionCauldronBlockEntity(pos, state);
+	}
+
+	@Override
+	public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+		if (world.isClient()) return null;
+
+		return (world1, pos, state1, be) -> {
+			if (be instanceof PotionCauldronBlockEntity potionCauldron) {
+				potionCauldron.tick(world1, pos);
+			}
+		};
 	}
 }

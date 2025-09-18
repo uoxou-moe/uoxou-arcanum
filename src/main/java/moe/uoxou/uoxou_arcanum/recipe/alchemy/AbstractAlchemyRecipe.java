@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-public abstract class AbstractAlchemyRecipe implements IAlchemyRecipe {
+public abstract class AbstractAlchemyRecipe<I extends IAlchemyRecipeInput> implements IAlchemyRecipe<I> {
 	private final List<Ingredient> ingredients;
 	private final List<IAlchemyResultEntry> result;
 	private final HeatType heatType;
@@ -28,7 +28,7 @@ public abstract class AbstractAlchemyRecipe implements IAlchemyRecipe {
 	}
 
 	@Override
-	public boolean matches(IAlchemyRecipeInput input, World world) {
+	public boolean matches(I input, World world) {
 		if (this.heatType == HeatType.FIRE && !input.getHeatSource().isIn(ModBlockTags.ALCHEMY_HEAT_SOURCES)) {
 			return false;
 		} else if (this.heatType == HeatType.SOUL_FIRE && !input.getHeatSource().isIn(ModBlockTags.ALCHEMY_SOUL_SOURCES)) {
@@ -45,29 +45,29 @@ public abstract class AbstractAlchemyRecipe implements IAlchemyRecipe {
 
 		Set<Ingredient> remaining = new java.util.HashSet<>(this.ingredients);
 
-		for (int i = 0; i < input.size(); i++) {
-			ItemStack stack = input.getStackInSlot(i);
+			List<ItemStack> inputStacks = input.getAllStacks().stream().map(ItemStack::copy).toList();
 
-			boolean matched = false;
 			for (Iterator<Ingredient> it = remaining.iterator(); it.hasNext(); ) {
 				Ingredient ingredient = it.next();
-				if (ingredient.test(stack)) {
-					it.remove();
-					matched = true;
-					break;
+
+				for (ItemStack stack : inputStacks) {
+					if (stack.isEmpty()) {
+						continue;
+					}
+					if (ingredient.test(stack)) {
+						stack.decrement(1);
+						it.remove();
+						break;
+					}
 				}
 			}
 
-			if (!matched) {
-				return false;
-			}
-		}
 
 		return remaining.isEmpty();
 	}
 
 	@Override
-	public ItemStack craft(IAlchemyRecipeInput input, RegistryWrapper.WrapperLookup registries) {
+	public ItemStack craft(I input, RegistryWrapper.WrapperLookup registries) {
 		int weightsSum =  this.result.stream()
 				.map(IAlchemyResultEntry::getWeight)
 				.mapToInt(Integer::intValue)
