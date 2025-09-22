@@ -1,6 +1,7 @@
 package moe.uoxou.uoxou_arcanum.client.datagen.lang;
 
 import moe.uoxou.uoxou_arcanum.block.ModBlocks;
+import moe.uoxou.uoxou_arcanum.item.ModItemGroups;
 import moe.uoxou.uoxou_arcanum.item.ModItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
@@ -21,5 +22,7 @@ public class ModJapaneseLangProvider extends FabricLanguageProvider {
 		translationBuilder.add(ModItems.MANA_BOTTLE, "マナ入りの瓶");
 		translationBuilder.add(ModItems.EMBELLISHED_GLASS_BOTTLE, "装飾されたガラス瓶");
 		translationBuilder.add(ModItems.ARCANE_GOLD_INGOT, "神秘の金インゴット");
+
+		translationBuilder.add(ModItemGroups.UOXOU_ARCANUM_KEY, "UoxoU Arcanum");
 	}
 }

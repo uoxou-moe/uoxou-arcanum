@@ -1,6 +1,7 @@
 package moe.uoxou.uoxou_arcanum.client.datagen.lang;
 
 import moe.uoxou.uoxou_arcanum.block.ModBlocks;
+import moe.uoxou.uoxou_arcanum.item.ModItemGroups;
 import moe.uoxou.uoxou_arcanum.item.ModItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
@@ -21,5 +22,7 @@ public class ModEnglishLangProvider extends FabricLanguageProvider {
 		translationBuilder.add(ModItems.MANA_BOTTLE, "Mana Bottle");
 		translationBuilder.add(ModItems.EMBELLISHED_GLASS_BOTTLE, "Embellished Glass Bottle");
 		translationBuilder.add(ModItems.ARCANE_GOLD_INGOT, "Arcane Gold Ingot");
+
+		translationBuilder.add(ModItemGroups.UOXOU_ARCANUM_KEY, "UoxoU Arcanum");
 	}
 }

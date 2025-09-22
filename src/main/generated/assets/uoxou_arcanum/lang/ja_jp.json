@@ -3,5 +3,6 @@
   "block.uoxou_arcanum.potion_cauldron": "ポーション入りの大釜",
   "item.uoxou_arcanum.arcane_gold_ingot": "神秘の金インゴット",
   "item.uoxou_arcanum.embellished_glass_bottle": "装飾されたガラス瓶",
-  "item.uoxou_arcanum.mana_bottle": "マナ入りの瓶"
+  "item.uoxou_arcanum.mana_bottle": "マナ入りの瓶",
+  "itemgroup.uoxou_arcanum.uoxou_arcanum": "UoxoU Arcanum"
 }

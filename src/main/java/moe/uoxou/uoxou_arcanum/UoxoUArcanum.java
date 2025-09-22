@@ -2,6 +2,7 @@ package moe.uoxou.uoxou_arcanum;
 
 import moe.uoxou.uoxou_arcanum.block.ModBlocks;
 import moe.uoxou.uoxou_arcanum.block.entity.ModBlockEntities;
+import moe.uoxou.uoxou_arcanum.item.ModItemGroups;
 import moe.uoxou.uoxou_arcanum.item.ModItems;
 import moe.uoxou.uoxou_arcanum.recipe.ModRecipeSerializers;
 import moe.uoxou.uoxou_arcanum.recipe.ModRecipeTypes;
@@ -19,6 +20,7 @@ public class UoxoUArcanum implements ModInitializer {
 		ModBlocks.init();
 		ModBlockEntities.init();
 		ModItems.init();
+		ModItemGroups.init();
 		ModRecipeTypes.init();
 		ModRecipeSerializers.init();
 
