@@ -24,6 +24,7 @@ public class ModModelProvider extends FabricModelProvider {
 	public void generateItemModels(ItemModelGenerator itemModelGenerator) {
 		itemModelGenerator.register(ModItems.EMBELLISHED_GLASS_BOTTLE, Models.GENERATED);
 		itemModelGenerator.register(ModItems.MANA_BOTTLE, Models.GENERATED);
+		itemModelGenerator.register(ModItems.ARCANE_GOLD_INGOT, Models.GENERATED);
 	}
 
 	@Override

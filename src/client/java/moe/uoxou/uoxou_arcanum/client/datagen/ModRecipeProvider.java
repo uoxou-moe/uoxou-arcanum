@@ -1,6 +1,7 @@
 package moe.uoxou.uoxou_arcanum.client.datagen;
 
 import moe.uoxou.uoxou_arcanum.UoxoUArcanum;
+import moe.uoxou.uoxou_arcanum.item.ModItems;
 import moe.uoxou.uoxou_arcanum.recipe.alchemy.*;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
@@ -49,6 +50,12 @@ public class ModRecipeProvider extends FabricRecipeProvider {
 						.needHeat()
 						.juiceCost(0)
 						.potion(Potions.STRENGTH)
+						.offerTo(this.exporter);
+				alchemy(UoxoUArcanum.identifier("arcane_gold_ingot"))
+						.input(Items.GOLD_INGOT)
+						.success(new ItemStack(ModItems.ARCANE_GOLD_INGOT), 100)
+						.juiceCost(1)
+						.needHeat()
 						.offerTo(this.exporter);
 			}
 		};

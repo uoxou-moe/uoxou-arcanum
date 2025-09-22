@@ -1,9 +1,11 @@
 // 1.21.8	-999999999-01-01T00:00:00	UoxoU Arcanum/UoxoU Arcanum Model Provider
 fd9ece8f6331fd9b9fe718127dd1f250a6a859cc assets/uoxou_arcanum/blockstates/mana_cauldron.json
 b2b2077481cb6e0092552784a8a76fbc513c08af assets/uoxou_arcanum/blockstates/potion_cauldron.json
+04ace3974df72d91900ef2d87eb2af8c336f42d8 assets/uoxou_arcanum/items/arcane_gold_ingot.json
 a13f88a0ccb83b04c3ba669975a328ac3d96aa09 assets/uoxou_arcanum/items/embellished_glass_bottle.json
 6f236f5d2d962da25344f3acd96bcc962dbdf678 assets/uoxou_arcanum/items/mana_bottle.json
 20d6b42a22bd2493a3e9b12bb1f2736cca092819 assets/uoxou_arcanum/models/block/mana_cauldron.json
 20d6b42a22bd2493a3e9b12bb1f2736cca092819 assets/uoxou_arcanum/models/block/potion_cauldron.json
+6218858d20a7538b281d9833ea7644418518dc93 assets/uoxou_arcanum/models/item/arcane_gold_ingot.json
 0df2d58819edd1358598090cd1407a7878871d5a assets/uoxou_arcanum/models/item/embellished_glass_bottle.json
 03c378e914798ed11945d2fee7b5fd2207f55f49 assets/uoxou_arcanum/models/item/mana_bottle.json

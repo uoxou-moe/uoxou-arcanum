@@ -1,0 +1,18 @@
+{
+  "type": "uoxou_arcanum:mana_alchemy",
+  "heat_type": "fire",
+  "ingredients": [
+    "minecraft:gold_ingot"
+  ],
+  "juice_cost": 1,
+  "result": [
+    {
+      "is_failure": false,
+      "item": {
+        "count": 1,
+        "id": "uoxou_arcanum:arcane_gold_ingot"
+      },
+      "weight": 100
+    }
+  ]
+}
